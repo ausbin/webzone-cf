@@ -1,0 +1,158 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  gtpd-monitor
+
+  Sample SAM Template for gtpd-monitor
+
+Parameters:
+  WebsiteBucketName: {Type: String}
+  WebsiteHostname: {Type: String}
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+
+Resources:
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref WebsiteBucketName
+      WebsiteConfiguration:
+        IndexDocument: 'index.html'
+        ErrorDocument: '404.html'
+
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: WebsiteBucket
+    Properties:
+      Bucket: !Ref WebsiteBucketName
+      PolicyDocument:
+        Version: 2012-10-17
+        Id: AllowCloudfrontAccess
+        Statement:
+        - Sid: AllowPublicReadAccess
+          Effect: Allow
+          Principal: '*'
+          Action: 's3:GetObject'
+          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}/*'
+        - Sid: AllowPrivateAccess
+          Effect: Allow
+          Principal:
+            CanonicalUser: !GetAtt CfOriginAccessIdentity.S3CanonicalUserId
+          Action: 's3:GetObject'
+          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}/*'
+
+  CfInvalidatorFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    DependsOn: CfDistribution
+    Properties:
+      CodeUri: update_function
+      Handler: gtpd_monitor/lambda.lambda_handler
+      Runtime: python3.8
+      Architectures:
+      #- x86_64
+      - arm64
+      Environment:
+        Variables:
+          WEBSITE_BUCKET_NAME: !Ref WebsiteBucketName
+          DISTRIBUTION_ID: !Ref CfDistribution
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: 'cloudfront:CreateInvalidation'
+          Resource: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CfDistribution}'
+        - Effect: Allow
+          Action:
+          - 's3:PutObject'
+          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}/*'
+
+  CfInvalidatorFunctionDailyRulePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt CfInvalidatorFunction.Arn
+      Principal: 'sns.amazonaws.com'
+      Action: 'lambda:InvokeFunction'
+      SourceArn: !GetAtt DailyUpdateRule.Arn
+
+  DailyUpdateRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: update-gtpd-monitor-daily
+      Description: 'Update GTPD monitor site daily'
+      ScheduleExpression: 'rate(24 hours)'
+      Targets:
+      - Arn: !GetAtt CfInvalidatorFunction.Arn
+        Id: gtpd-monitor-lambda
+
+  CfDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn: WebsiteBucket
+    Properties:
+      DistributionConfig:
+        Aliases:
+        - !Ref WebsiteHostname
+        Enabled: true
+        IPV6Enabled: true
+        DefaultRootObject: index.html
+        CustomErrorResponses:
+        - ErrorCode: 403
+          ResponseCode: 404
+          ResponsePagePath: /404.html
+        DefaultCacheBehavior:
+          AllowedMethods: [GET, HEAD]
+          ForwardedValues: {QueryString: false}
+          TargetOriginId: s3
+          ViewerProtocolPolicy: redirect-to-https
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CfDistributionCert
+          SslSupportMethod: sni-only
+        Origins:
+        - Id: s3
+          DomainName: !Sub '${WebsiteBucketName}.s3.amazonaws.com'
+          S3OriginConfig:
+            OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CfOriginAccessIdentity}'
+
+  CfDistributionCert:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref WebsiteHostname
+      ValidationMethod: DNS
+
+  CfOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'gtpd monitor bucket identity'
+
+  WebsiteBucketEditorPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    DependsOn: WebsiteBucket
+    Properties:
+      ManagedPolicyName: GTPDMonitorEditor
+      Description: !Sub 'Full access to ${WebsiteBucketName} bucket'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: ConsoleAccess
+          Effect: Allow
+          Action:
+          - 's3:GetAccountPublicAccessBlock'
+          - 's3:GetBucketAcl'
+          - 's3:GetBucketLocation'
+          - 's3:GetBucketPolicyStatus'
+          - 's3:GetBucketPublicAccessBlock'
+          - 's3:ListAllMyBuckets'
+          Resource: '*'
+        - Sid: ListObjectsInBucket
+          Effect: Allow
+          Action: 's3:ListBucket'
+          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}'
+        - Sid: AllObjectActions
+          Effect: Allow
+          Action: 's3:*Object'
+          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}/*'
+
+# vim:set ts=2 sw=2 et:
