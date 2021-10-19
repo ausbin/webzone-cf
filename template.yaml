@@ -73,7 +73,7 @@ Resources:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !GetAtt CfInvalidatorFunction.Arn
-      Principal: 'sns.amazonaws.com'
+      Principal: 'events.amazonaws.com'
       Action: 'lambda:InvokeFunction'
       SourceArn: !GetAtt DailyUpdateRule.Arn
 
