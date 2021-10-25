@@ -2,6 +2,9 @@ import boto3
 
 FILENAME = 'index.html'
 CONTENT_TYPE = 'text/html'
+# Need to use an actual template language or react, this is getting ridiculous
+PASTYEARS_SEP = ', '
+PASTYEARS_TEMPLATE = '<strong>{year}:</strong> {counter}'
 TEMPLATE = '''<!DOCTYPE html>
 <html>
 <head>
@@ -35,13 +38,14 @@ TEMPLATE = '''<!DOCTYPE html>
 <body>
     <p>GTPD Mental Health Calls Reported in <strong>{year}</strong>:</p>
     <p id="counter">{counter}</p>
+    <p>Past years:<br/>{pastyears}</p>
     <footer>last updated {last_updated}. <a href="https://police.gatech.edu/crime-logs-and-map">data source</a>. <a href="https://github.com/ausbin/gtpd-counter">source code</a></footer>
 </body>
 </html>
 '''
 
-def push_to_s3(distrib_id, bucket, counter, timestamp):
-    page_bytes = gen_page(counter, timestamp).encode('utf-8')
+def push_to_s3(distrib_id, bucket, year_counters, timestamp):
+    page_bytes = gen_page(year_counters, timestamp).encode('utf-8')
 
     s3 = boto3.resource('s3')
     s3.Bucket(bucket).put_object(Key=FILENAME, Body=page_bytes, ContentType=CONTENT_TYPE)
@@ -55,5 +59,9 @@ def push_to_s3(distrib_id, bucket, counter, timestamp):
         },
     })
 
-def gen_page(counter, timestamp):
-    return TEMPLATE.format(year=timestamp.year, counter=counter, last_updated=str(timestamp))
+def gen_page(year_counters, timestamp):
+    this_year = timestamp.year
+    pastyears = PASTYEARS_SEP.join(PASTYEARS_TEMPLATE.format(year=year, counter=counter)
+                                   for year, counter in year_counters.items() if year != this_year)
+    return TEMPLATE.format(year=this_year, counter=year_counters[this_year],
+                           last_updated=str(timestamp), pastyears=pastyears)
