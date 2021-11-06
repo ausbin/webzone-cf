@@ -1,4 +1,4 @@
-gtpd-tracker
+gtpd-monitor
 ============
 
 This is the CloudFormation template for a tracker for incidents in which the
