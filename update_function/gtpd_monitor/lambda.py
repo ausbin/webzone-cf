@@ -8,6 +8,7 @@ def lambda_handler(event, context):
     distrib_id = os.environ['DISTRIBUTION_ID']
     timestamp = datetime.now()
     this_year = timestamp.year
+    this_month = timestamp.month-1
 
-    year_incidents = fetch_all_incidents(this_year)
-    push_to_s3(distrib_id, bucket_name, year_incidents, timestamp)
+    incidents = fetch_all_incidents(this_year, this_month)
+    push_to_s3(distrib_id, bucket_name, incidents, timestamp)

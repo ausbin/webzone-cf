@@ -3,21 +3,31 @@ import codecs
 import contextlib
 import requests
 from datetime import datetime
+from collections import namedtuple
 
 # Data started in 2010, but mental health code was not introduced until 2018
 #START_YEAR = 2010
+# Mental health code started being used in May 2018
+START_YEAR_MONTH = 4
 START_YEAR = 2018
 PREV_YEAR_URL = 'https://police.gatech.edu/sites/default/files/documents/crimelogs/{year}%20Crime%20Log.csv'
 THIS_YEAR_URL = 'https://police.gatech.edu/crimelogcsv.php'
 MENTAL_HEALTH_CODE = '9999MH'
 OFFENSE_CODE_COL = 'OffenseCode'
-DATE_COLS = ['IncidentFromDate', 'IncidentToDate']
+FROM_DATE_COL = 'IncidentFromDate'
 
-def fetch_all_incidents(this_year):
+Incidents = namedtuple('Incidents', ['start_year', 'start_month', 'end_year', 'end_month', 'year_incidents'])
+
+def fetch_all_incidents(this_year, this_month):
     year_incidents = {}
     for year in range(START_YEAR, this_year+1):
         year_incidents[year] = fetch_incidents(year, this_year)
-    return year_incidents
+    return make_incidents(this_year, this_month, year_incidents)
+
+def make_incidents(this_year, this_month, year_incidents):
+    return Incidents(start_year=START_YEAR, start_month=START_YEAR_MONTH,
+                     end_year=this_year, end_month=this_month,
+                     year_incidents=year_incidents)
 
 def fetch_incidents(year, this_year):
     if year == this_year:
@@ -66,30 +76,26 @@ def guess_utf8(fp):
     is_utf8 = first_bytes[1] != 0
     return is_utf8, first_bytes
 
+# Expects to be already decoded properly
 def parse_incidents(fp, year):
     reader = csv.DictReader(fp)
-    num_incidents = 0
+    month_incidents = [0]*12
     num_rows = 0
 
     for row in reader:
         num_rows += 1
-        date_strs = [row[date_col] for date_col in DATE_COLS]
-        dates = [date for date in (to_datetime(date_str) for date_str in date_strs
-                                   if date_str and date_str.upper() != 'NULL')
-                 if date is not None]
-
-        # Be very conservative: start and end date must fall in this year
-        wrong_years = [date.year for date in dates if date.year != year]
-        if not dates:
-            print('warning: row is missing any date. ignoring...')
-        elif wrong_years:
-            print('warning: year {} is not this year ({}). ignoring...'.format(wrong_years[0], year))
+        date_str = row[FROM_DATE_COL]
+        date = None if date_str.upper() == 'NULL' else to_datetime(date_str)
+        if not date:
+            print('warning: row {} is missing a date. ignoring...'.format(num_rows))
+        elif date.year != year:
+            print('warning: row {} year {} is not this year ({}). ignoring...'.format(num_rows, wrong_years[0], year))
         elif row[OFFENSE_CODE_COL] == MENTAL_HEALTH_CODE:
-            num_incidents += 1
+            month_incidents[date.month-1] += 1
 
     print('number of rows: {}\n'.format(num_rows))
 
-    return num_incidents
+    return month_incidents
 
 def to_datetime(date_str):
     # 01/22/2021

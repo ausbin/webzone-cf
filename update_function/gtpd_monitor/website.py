@@ -44,8 +44,8 @@ TEMPLATE = '''<!DOCTYPE html>
 </html>
 '''
 
-def push_to_s3(distrib_id, bucket, year_counters, timestamp):
-    page_bytes = gen_page(year_counters, timestamp).encode('utf-8')
+def push_to_s3(distrib_id, bucket, incidents, timestamp):
+    page_bytes = gen_page(incidents, timestamp).encode('utf-8')
 
     s3 = boto3.resource('s3')
     s3.Bucket(bucket).put_object(Key=FILENAME, Body=page_bytes, ContentType=CONTENT_TYPE)
@@ -59,9 +59,10 @@ def push_to_s3(distrib_id, bucket, year_counters, timestamp):
         },
     })
 
-def gen_page(year_counters, timestamp):
+def gen_page(incidents, timestamp):
     this_year = timestamp.year
-    pastyears = PASTYEARS_SEP.join(PASTYEARS_TEMPLATE.format(year=year, counter=counter)
-                                   for year, counter in year_counters.items() if year != this_year)
-    return TEMPLATE.format(year=this_year, counter=year_counters[this_year],
+    year_incidents = incidents.year_incidents
+    pastyears = PASTYEARS_SEP.join(PASTYEARS_TEMPLATE.format(year=year, counter=sum(month_incidents))
+                                   for year, month_incidents in year_incidents.items() if year < this_year)
+    return TEMPLATE.format(year=this_year, counter=sum(year_incidents[this_year]),
                            last_updated=str(timestamp), pastyears=pastyears)
