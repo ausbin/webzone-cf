@@ -3,11 +3,10 @@
 import os
 import sys
 import csv
-import json
 from argparse import ArgumentParser
 from datetime import datetime
 from update_function.gtpd_monitor.fetch import fetch_all_incidents, parse_incidents, make_incidents
-from update_function.gtpd_monitor.website import gen_page, push_to_s3
+from update_function.gtpd_monitor.website import push_to_s3, incidents_json
 
 def main(args):
     """
@@ -16,7 +15,6 @@ def main(args):
 
     parser = ArgumentParser()
     parser.add_argument('--dir', help='load csvs from directory instead')
-    parser.add_argument('--html-file', help='write html to file instead')
     parser.add_argument('--csv-file', help='write csv to file instead')
     parser.add_argument('--json-file', help='write json to file instead')
     parser.add_argument('--bucket', help='s3 bucket to write to')
@@ -42,17 +40,14 @@ def main(args):
     else:
         incidents = fetch_all_incidents(timestamp)
 
-    if args.html_file:
-        with open(args.html_file, 'w') as fp:
-            fp.write(gen_page(incidents, timestamp))
-    elif args.json_file:
+    if args.json_file:
         with open(args.json_file, 'w') as fp:
-            json.dump(incidents._asdict(), fp)
+            fp.write(incidents_json(incidents));
     elif args.csv_file:
         with open(args.csv_file, 'w') as fp:
             writer = csv.writer(fp)
             writer.writerow(['Year', 'Month', 'Incidents'])
-            for year, month_incidents in year_incidents.items():
+            for year, month_incidents in incidents.year_incidents.items():
                 if year < incidents.start_year or year > incidents.end_year:
                     continue
                 for month_idx, month_incidents in enumerate(month_incidents):
@@ -64,9 +59,9 @@ def main(args):
 
                     writer.writerow([year, month_idx+1, month_incidents])
     elif args.bucket and args.distrib_id:
-        push_to_s3(args.distrib_id, args.bucket, year_incidents, timestamp)
+        push_to_s3(args.distrib_id, args.bucket, incidents, timestamp)
     else:
-        print('incidents: {}'.format(year_incidents))
+        print('incidents: {}'.format(incidents))
 
 if __name__ == '__main__':
     main(sys.argv[1:])

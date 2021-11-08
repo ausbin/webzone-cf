@@ -30,7 +30,8 @@ def make_incidents(timestamp, year_incidents):
     this_month = timestamp.month-1
     return Incidents(start_year=START_YEAR, start_month=START_YEAR_MONTH,
                      end_year=this_year, end_month=this_month,
-                     year_incidents=year_incidents, last_updated=str(timestamp))
+                     year_incidents=year_incidents,
+                     last_updated=timestamp.isoformat(' ', 'minutes'))
 
 def fetch_incidents(year, this_year):
     if year == this_year:
