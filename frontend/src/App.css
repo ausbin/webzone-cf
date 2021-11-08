@@ -3,7 +3,7 @@ html, body {
 }
 
 .App {
-    max-width: 256px;
+    max-width: 512px;
     margin: 64px auto 0 auto;
 
     color: black;
@@ -13,17 +13,31 @@ html, body {
 }
 
 .App-counter {
-    margin: 1em 0;
+    margin: 32px 0;
     font-size: 64px;
     font-weight: bold;
 }
 
-.App-pastyears {
-    padding: 0;
-    list-style: none;
+.App-pastyear {
+    display: inline;
+}
+
+.App-pastyear ~ .App-pastyear::before {
+    content: ', ';
 }
 
 .App-footer {
-    margin-top: 64px;
-    font-size: 8px;
+    margin-top: 32px;
+    font-size: 10px;
+}
+
+.App-bee {
+    display: inline-block;
+    animation: spin 0.5s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
 }

@@ -4,7 +4,8 @@ gtpd-monitor
 This is the CloudFormation template for a tracker for incidents in which the
 Georgia Tech Police Department reported an incident tagged with the mental
 health "offense code". The job runs daily. This repository uses [SAM][1], a
-handy wrapper around [CloudFormation][2].
+handy wrapper around [CloudFormation][2]. The frontend (in `frontend/`) is a
+simple React app.
 
 How to update:
 
@@ -18,8 +19,11 @@ The first time you run this, you'll need to:
     Console for the stack, you can see what CNAME it expects
  2. Add A and AAAA records which are aliases for the CloudFront
     distribution once CloudFormation has set it up
- 3. Upload the 404 page:
-    `aws s3 cp 404.html s3://gtpd-monitor-website/404.html`
+ 3. Upload the frontend:
+    1. Go to the frontend directory: `cd frontend`
+    2. Install dependencies: `npm install`
+    3. Build prod frontend: `npm run build`
+    4. Upload prod frontend: `cd build && aws s3 sync . s3://gtpd-monitor-website/`
 
 To locally test the lambda, you can use `./local.py`. There are various flags
 that change its behavior. You can create a virtualenv (e.g., `virtualenv -p
