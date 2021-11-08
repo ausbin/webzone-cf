@@ -7,8 +7,8 @@ from collections import namedtuple
 
 # Data started in 2010, but mental health code was not introduced until 2018
 #START_YEAR = 2010
-# Mental health code started being used in May 2018
-START_YEAR_MONTH = 4
+# Mental health code started being used in June 2018
+START_YEAR_MONTH = 5
 START_YEAR = 2018
 PREV_YEAR_URL = 'https://police.gatech.edu/sites/default/files/documents/crimelogs/{year}%20Crime%20Log.csv'
 THIS_YEAR_URL = 'https://police.gatech.edu/crimelogcsv.php'
@@ -16,7 +16,7 @@ MENTAL_HEALTH_CODE = '9999MH'
 OFFENSE_CODE_COL = 'OffenseCode'
 FROM_DATE_COL = 'IncidentFromDate'
 
-Incidents = namedtuple('Incidents', ['start_year', 'start_month', 'end_year', 'end_month', 'year_incidents', 'last_updated'])
+Incidents = namedtuple('Incidents', ['start_year', 'start_month', 'end_year', 'end_month', 'year_incidents', 'last_updated', 'offense_code'])
 
 def fetch_all_incidents(timestamp):
     this_year = timestamp.year
@@ -31,7 +31,8 @@ def make_incidents(timestamp, year_incidents):
     return Incidents(start_year=START_YEAR, start_month=START_YEAR_MONTH,
                      end_year=this_year, end_month=this_month,
                      year_incidents=year_incidents,
-                     last_updated=timestamp.isoformat(' ', 'minutes'))
+                     last_updated=timestamp.isoformat(' ', 'minutes'),
+                     offense_code=MENTAL_HEALTH_CODE)
 
 def fetch_incidents(year, this_year):
     if year == this_year:
