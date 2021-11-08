@@ -16,18 +16,21 @@ MENTAL_HEALTH_CODE = '9999MH'
 OFFENSE_CODE_COL = 'OffenseCode'
 FROM_DATE_COL = 'IncidentFromDate'
 
-Incidents = namedtuple('Incidents', ['start_year', 'start_month', 'end_year', 'end_month', 'year_incidents'])
+Incidents = namedtuple('Incidents', ['start_year', 'start_month', 'end_year', 'end_month', 'year_incidents', 'last_updated'])
 
-def fetch_all_incidents(this_year, this_month):
+def fetch_all_incidents(timestamp):
+    this_year = timestamp.year
     year_incidents = {}
     for year in range(START_YEAR, this_year+1):
         year_incidents[year] = fetch_incidents(year, this_year)
-    return make_incidents(this_year, this_month, year_incidents)
+    return make_incidents(timestamp, year_incidents)
 
-def make_incidents(this_year, this_month, year_incidents):
+def make_incidents(timestamp, year_incidents):
+    this_year = timestamp.year
+    this_month = timestamp.month-1
     return Incidents(start_year=START_YEAR, start_month=START_YEAR_MONTH,
                      end_year=this_year, end_month=this_month,
-                     year_incidents=year_incidents)
+                     year_incidents=year_incidents, last_updated=str(timestamp))
 
 def fetch_incidents(year, this_year):
     if year == this_year:

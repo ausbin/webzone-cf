@@ -3,6 +3,7 @@
 import os
 import sys
 import csv
+import json
 from argparse import ArgumentParser
 from datetime import datetime
 from update_function.gtpd_monitor.fetch import fetch_all_incidents, parse_incidents, make_incidents
@@ -17,14 +18,13 @@ def main(args):
     parser.add_argument('--dir', help='load csvs from directory instead')
     parser.add_argument('--html-file', help='write html to file instead')
     parser.add_argument('--csv-file', help='write csv to file instead')
+    parser.add_argument('--json-file', help='write json to file instead')
     parser.add_argument('--bucket', help='s3 bucket to write to')
     parser.add_argument('--distrib-id', help='cloudfront distribution id to invalidate')
     args = parser.parse_args(args)
 
     # Do this once to avoid race conditions
     timestamp = datetime.now()
-    this_year = timestamp.year
-    this_month = timestamp.month-1
 
     if args.dir:
         year_incidents = {}
@@ -38,13 +38,16 @@ def main(args):
             with open(os.path.join(args.dir, year_csv), encoding='utf-8', newline='') as fp:
                 year_incidents[year] = parse_incidents(fp, year)
 
-        incidents = make_incidents(this_year, this_month, year_incidents)
+        incidents = make_incidents(timestamp, year_incidents)
     else:
-        incidents = fetch_all_incidents(this_year, this_month)
+        incidents = fetch_all_incidents(timestamp)
 
     if args.html_file:
         with open(args.html_file, 'w') as fp:
             fp.write(gen_page(incidents, timestamp))
+    elif args.json_file:
+        with open(args.json_file, 'w') as fp:
+            json.dump(incidents._asdict(), fp)
     elif args.csv_file:
         with open(args.csv_file, 'w') as fp:
             writer = csv.writer(fp)
