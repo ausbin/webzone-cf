@@ -6,7 +6,7 @@ import csv
 from argparse import ArgumentParser
 from datetime import datetime
 from update_function.gtpd_monitor.fetch import fetch_all_incidents, parse_incidents, make_incidents
-from update_function.gtpd_monitor.website import push_to_s3, incidents_json
+from update_function.gtpd_monitor.website import push_to_s3, incidents_json, incidents_csv
 
 def main(args):
     """
@@ -45,19 +45,7 @@ def main(args):
             fp.write(incidents_json(incidents));
     elif args.csv_file:
         with open(args.csv_file, 'w') as fp:
-            writer = csv.writer(fp)
-            writer.writerow(['Year', 'Month', 'Incidents'])
-            for year, month_incidents in incidents.year_incidents.items():
-                if year < incidents.start_year or year > incidents.end_year:
-                    continue
-                for month_idx, month_incidents in enumerate(month_incidents):
-                    if year < incidents.start_year \
-                       or (year == incidents.start_year and month_idx < incidents.start_month) \
-                       or (year == incidents.end_year and month_idx > incidents.end_month) \
-                       or year > incidents.end_year:
-                        continue
-
-                    writer.writerow([year, month_idx+1, month_incidents])
+            fp.write(incidents_csv(incidents))
     elif args.bucket and args.distrib_id:
         push_to_s3(args.distrib_id, args.bucket, incidents, timestamp)
     else:

@@ -5,6 +5,7 @@ import './App.css';
 
 interface AppProps {
   incidentsUrl: string,
+  incidentsCsvUrl: string,
 }
 
 interface Incidents {
@@ -94,7 +95,7 @@ function App(props: AppProps) {
           <p>Past years: {pastYears(incidents)}</p>
           <p>Month-by-month breakdown:</p>
           <div className="chart">{chart}</div>
-          <footer className="App-footer">{(incidents.start_month > 0)? ('* Data for ' + incidents.start_year + ' begins in ' + monthIdxToName(incidents.start_month, false) + '. ') : ''}last updated {incidents.last_updated}. <a href="https://police.gatech.edu/crime-logs-and-map">data source</a> (use "Offense Code" {incidents.offense_code}). <a href="https://github.com/ausbin/gtpd-monitor">source code</a></footer>
+          <footer className="App-footer">{(incidents.start_month > 0)? ('* Data for ' + incidents.start_year + ' begins in ' + monthIdxToName(incidents.start_month, false) + '. ') : ''}last updated {incidents.last_updated}. <a href={props.incidentsCsvUrl}> download csv</a>. <a href="https://police.gatech.edu/crime-logs-and-map">original data source</a> (use "Offense Code" {incidents.offense_code}). <a href="https://github.com/ausbin/gtpd-monitor">source code</a></footer>
       </div>
     );
 
