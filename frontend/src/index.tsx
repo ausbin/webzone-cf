@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App incidentsUrl="/incidents.json" incidentsCsvUrl="/incidents.csv" />
+    <App incidentsUrl="/incidents.json" incidentsByMonthCsvUrl="/incidents_by_month.csv" incidentsByHourCsvUrl="/incidents_by_hour.csv" />
   </React.StrictMode>,
   document.getElementById('root')
 );

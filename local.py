@@ -6,7 +6,7 @@ import csv
 from argparse import ArgumentParser
 from datetime import datetime
 from update_function.gtpd_monitor.fetch import fetch_all_incidents, parse_incidents, make_incidents
-from update_function.gtpd_monitor.website import push_to_s3, incidents_json, incidents_csv
+from update_function.gtpd_monitor.website import push_to_s3, incidents_json, incidents_by_month_csv, incidents_by_hour_csv
 
 def main(args):
     """
@@ -15,7 +15,8 @@ def main(args):
 
     parser = ArgumentParser()
     parser.add_argument('--dir', help='load csvs from directory instead')
-    parser.add_argument('--csv-file', help='write csv to file instead')
+    parser.add_argument('--month-csv-file', help='write by-month csv to file instead')
+    parser.add_argument('--hour-csv-file', help='write by-month csv to file instead')
     parser.add_argument('--json-file', help='write json to file instead')
     parser.add_argument('--bucket', help='s3 bucket to write to')
     parser.add_argument('--distrib-id', help='cloudfront distribution id to invalidate')
@@ -43,9 +44,12 @@ def main(args):
     if args.json_file:
         with open(args.json_file, 'w') as fp:
             fp.write(incidents_json(incidents));
-    elif args.csv_file:
-        with open(args.csv_file, 'w') as fp:
-            fp.write(incidents_csv(incidents))
+    elif args.month_csv_file:
+        with open(args.month_csv_file, 'w') as fp:
+            fp.write(incidents_by_month_csv(incidents))
+    elif args.hour_csv_file:
+        with open(args.hour_csv_file, 'w') as fp:
+            fp.write(incidents_by_hour_csv(incidents))
     elif args.bucket and args.distrib_id:
         push_to_s3(args.distrib_id, args.bucket, incidents, timestamp)
     else:

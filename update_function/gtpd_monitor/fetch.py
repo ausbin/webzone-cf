@@ -15,7 +15,9 @@ THIS_YEAR_URL = 'https://police.gatech.edu/crimelogcsv.php'
 MENTAL_HEALTH_CODE = '9999MH'
 OFFENSE_CODE_COL = 'OffenseCode'
 FROM_DATE_COL = 'IncidentFromDate'
+FROM_TIME_COL = 'IncidentFromTime'
 
+YearIncidents = namedtuple('YearIncidents', ['by_month', 'by_hour'])
 Incidents = namedtuple('Incidents', ['start_year', 'start_month', 'end_year', 'end_month', 'year_incidents', 'last_updated', 'offense_code'])
 
 def fetch_all_incidents(timestamp):
@@ -27,7 +29,7 @@ def fetch_all_incidents(timestamp):
 
 def make_incidents(timestamp, year_incidents):
     this_year = timestamp.year
-    this_month = timestamp.month-1
+    this_month = timestamp.month
     return Incidents(start_year=START_YEAR, start_month=START_YEAR_MONTH,
                      end_year=this_year, end_month=this_month,
                      year_incidents=year_incidents,
@@ -85,27 +87,30 @@ def guess_utf8(fp):
 def parse_incidents(fp, year):
     reader = csv.DictReader(fp)
     month_incidents = [0]*12
+    hour_incidents = [0]*24
     num_rows = 0
 
     for row in reader:
         num_rows += 1
-        date_str = row[FROM_DATE_COL]
-        date = None if date_str.upper() == 'NULL' else to_datetime(date_str)
+        date_str, time_str = row[FROM_DATE_COL], row[FROM_TIME_COL]
+        date = None if {'NULL', ''} & {date_str.upper(), time_str.upper()} else to_datetime(date_str, time_str)
         if not date:
-            print('warning: row {} is missing a date. ignoring...'.format(num_rows))
+            print('warning: row {} is missing a date or time. ignoring...'.format(num_rows))
         elif date.year != year:
             print('warning: row {} year {} is not this year ({}). ignoring...'.format(num_rows, wrong_years[0], year))
         elif row[OFFENSE_CODE_COL] == MENTAL_HEALTH_CODE:
             month_incidents[date.month-1] += 1
+            hour_incidents[date.hour] += 1
 
     print('number of rows: {}\n'.format(num_rows))
 
-    return month_incidents
+    return YearIncidents(by_month=month_incidents, by_hour=hour_incidents)
 
-def to_datetime(date_str):
-    # 01/22/2021
+def to_datetime(date_str, time_str):
+    # Date looks like: 01/22/2021
+    # Time looks like: 02:32:01
     try:
-        return datetime.strptime(date_str, '%m/%d/%Y')
+        return datetime.strptime(date_str + ' ' + time_str, '%m/%d/%Y %H:%M:%S')
     except ValueError as e:
         print('invalid date format: {}'.format(e))
         return None

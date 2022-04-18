@@ -26,6 +26,11 @@ html, body {
     content: ', ';
 }
 
+/* Heh, yeah, I'm a professional frontend dev. Why do you ask? */
+.App-lilskip {
+    margin-top: 24px;
+}
+
 .App-footer {
     margin-top: 32px;
     font-size: 10px;
