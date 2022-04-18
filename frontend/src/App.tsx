@@ -133,9 +133,9 @@ function App(props: AppProps) {
           <p>Times the Georgia Tech Police Department responded to a mental health incident in <strong>{incidents.end_year}</strong>:</p>
           <p className="App-counter">{incidents.year_incidents[incidents.end_year].by_month.reduce((a,b) => a+b, 0)}</p>
           <p>Past years: {pastYears(incidents)}</p>
-          <p>Month-by-month breakdown:</p>
+          <p>Month-by-month statistics:</p>
           <div className="chart">{byMonthChart}</div>
-          <p className="App-lilskip">Hour-by-hour breakdown:</p>
+          <p className="App-lilskip">Hour-by-hour statistics:</p>
           <div className="chart">{byHourChart}</div>
           <footer className="App-footer">{(incidents.start_month > 0)? ('* Data for ' + incidents.start_year + ' begins in ' + monthIdxToName(incidents.start_month, false) + '. ') : ''}last updated {incidents.last_updated}. download csv: <a href={props.incidentsByMonthCsvUrl}>by month</a>, <a href={props.incidentsByHourCsvUrl}>by hour</a>. <a href="https://police.gatech.edu/crime-logs-and-map">original data source</a> (use "Offense Code" {incidents.offense_code}). <a href="https://github.com/ausbin/gtpd-monitor">source code</a></footer>
       </div>
