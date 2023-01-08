@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  gtpd-monitor
+  webzone
 
-  Sample SAM Template for gtpd-monitor
+  Sample SAM Template for webzone
 
 Parameters:
   WebsiteBucketName: {Type: String}
@@ -12,7 +12,7 @@ Parameters:
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 30
+    Timeout: 60
 
 Resources:
   WebsiteBucket:
@@ -44,12 +44,12 @@ Resources:
           Action: 's3:GetObject'
           Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}/*'
 
-  CfInvalidatorFunction:
+  RebuilderFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     DependsOn: CfDistribution
     Properties:
       CodeUri: update_function
-      Handler: gtpd_monitor/lambda.lambda_handler
+      Handler: webzone/lambda.lambda_handler
       Runtime: python3.8
       Architectures:
       #- x86_64
@@ -72,7 +72,7 @@ Resources:
   CfInvalidatorFunctionDailyRulePermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt CfInvalidatorFunction.Arn
+      FunctionName: !GetAtt RebuilderFunction.Arn
       Principal: 'events.amazonaws.com'
       Action: 'lambda:InvokeFunction'
       SourceArn: !GetAtt DailyUpdateRule.Arn
@@ -84,7 +84,7 @@ Resources:
       Description: 'Update GTPD monitor site daily'
       ScheduleExpression: 'rate(24 hours)'
       Targets:
-      - Arn: !GetAtt CfInvalidatorFunction.Arn
+      - Arn: !GetAtt RebuilderFunction.Arn
         Id: gtpd-monitor-lambda
 
   CfDistribution:
