@@ -94,7 +94,7 @@ Resources:
   RebuilderFunctionUrl:
     Type: AWS::Lambda::Url
     Properties:
-      TargetFunctionArn: !GetAtt RebuilderFunction.Arn
+      TargetFunctionArn: !Ref RebuilderFunction
       Qualifier: rebuild-webzone
       AuthType: NONE
 
