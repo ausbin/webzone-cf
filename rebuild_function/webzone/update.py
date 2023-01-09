@@ -47,7 +47,11 @@ def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
     # Now, walk the filesystem!
     top = True
     for path, dirs, files in os.walk(local_path):
-        dir_ = '/'.join(os.path.relpath(path, local_path).strip(os.sep).split(os.sep))
+        relpath = os.path.relpath(path, local_path)
+        # Need to handle the case of the top-level directory
+        if relpath == '.':
+            relpath = ''
+        dir_ = '/'.join(relpath.strip(os.sep).split(os.sep))
 
         for file in files:
             if file == 'index.html' and not top:
