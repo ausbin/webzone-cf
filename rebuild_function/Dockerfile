@@ -1,4 +1,7 @@
 # From https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-create-from-base
+#
+# tl;dr, on an ARMv8 machine:
+# docker build -t webzone-rebuild-function .
 
 FROM public.ecr.aws/lambda/python:3.9-arm64
 

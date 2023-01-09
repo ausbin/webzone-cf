@@ -18,11 +18,11 @@ The first time you run this, you'll need to:
 2. Add A and AAAA records which are aliases for the CloudFront
    distribution once CloudFormation has set it up
 
-To locally test the lambda, you can use `./local.py`. There are various flags
-that change its behavior. You can create a virtualenv (e.g., `virtualenv -p
-python3 venv; . venv/bin/activate`) and use `requirements.txt` to install the
-dependencies (`pip install -r update_function/requirements.txt`). There's
-probably some overcomplicated SAM way to do this instead but I don't care
+To locally test the lambda, you can use `./local.py` inside `webzone/`. There
+are various flags that change its behavior. You can create a virtualenv (e.g.,
+`virtualenv -p python3 venv; . venv/bin/activate`) and use `requirements.txt`
+to install the dependencies (`pip install -r update_function/requirements.txt`).
+There's probably some overcomplicated SAM way to do this instead but I don't care
 
 Links
 -----

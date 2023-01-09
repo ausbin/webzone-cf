@@ -8,3 +8,4 @@ sam deploy --template-file packaged.yaml --region us-east-1 \
            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
            --parameter-overrides 'WebsiteBucketName=austinjadams-com-website' \
                                  'WebsiteHostname=ausb.in' \
+                                 'GitCloneUrl=https://github.com/ausbin/webzone.git' \

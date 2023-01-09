@@ -6,6 +6,7 @@ Description: >
   Sample SAM Template for webzone
 
 Parameters:
+  GitCloneUrl: {Type: String}
   WebsiteBucketName: {Type: String}
   WebsiteHostname: {Type: String}
   
@@ -47,15 +48,19 @@ Resources:
   RebuilderFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     DependsOn: CfDistribution
+    Metadata:
+      DockerContext: ./rebuild_function
+      Dockerfile: Dockerfile
+      DockerTag: python3.9-v1
     Properties:
-      CodeUri: update_function
+      PackageType: Image
       Handler: webzone/lambda.lambda_handler
-      Runtime: python3.8
       Architectures:
       #- x86_64
       - arm64
       Environment:
         Variables:
+          GIT_CLONE_URL: !Ref GitCloneUrl
           WEBSITE_BUCKET_NAME: !Ref WebsiteBucketName
           DISTRIBUTION_ID: !Ref CfDistribution
       Policies:
@@ -68,24 +73,6 @@ Resources:
           Action:
           - 's3:PutObject'
           Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}/*'
-
-  CfInvalidatorFunctionDailyRulePermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !GetAtt RebuilderFunction.Arn
-      Principal: 'events.amazonaws.com'
-      Action: 'lambda:InvokeFunction'
-      SourceArn: !GetAtt DailyUpdateRule.Arn
-
-  DailyUpdateRule:
-    Type: AWS::Events::Rule
-    Properties:
-      Name: update-gtpd-monitor-daily
-      Description: 'Update GTPD monitor site daily'
-      ScheduleExpression: 'rate(24 hours)'
-      Targets:
-      - Arn: !GetAtt RebuilderFunction.Arn
-        Id: gtpd-monitor-lambda
 
   CfDistribution:
     Type: AWS::CloudFront::Distribution
@@ -125,34 +112,6 @@ Resources:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
       CloudFrontOriginAccessIdentityConfig:
-        Comment: 'gtpd monitor bucket identity'
-
-  WebsiteBucketEditorPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    DependsOn: WebsiteBucket
-    Properties:
-      ManagedPolicyName: GTPDMonitorEditor
-      Description: !Sub 'Full access to ${WebsiteBucketName} bucket'
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Sid: ConsoleAccess
-          Effect: Allow
-          Action:
-          - 's3:GetAccountPublicAccessBlock'
-          - 's3:GetBucketAcl'
-          - 's3:GetBucketLocation'
-          - 's3:GetBucketPolicyStatus'
-          - 's3:GetBucketPublicAccessBlock'
-          - 's3:ListAllMyBuckets'
-          Resource: '*'
-        - Sid: ListObjectsInBucket
-          Effect: Allow
-          Action: 's3:ListBucket'
-          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}'
-        - Sid: AllObjectActions
-          Effect: Allow
-          Action: 's3:*Object'
-          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}/*'
+        Comment: 'webzone bucket identity'
 
 # vim:set ts=2 sw=2 et:
