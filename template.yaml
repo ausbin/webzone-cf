@@ -99,6 +99,8 @@ Resources:
         Origins:
         - Id: s3
           DomainName: !Sub '${WebsiteBucketName}.s3-website.${AWS::Region}.amazonaws.com'
+          CustomOriginConfig:
+            OriginProtocolPolicy: http-only
 
   CfDistributionCert:
     Type: AWS::CertificateManager::Certificate
