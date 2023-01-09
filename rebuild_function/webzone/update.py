@@ -38,7 +38,7 @@ def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
     bucket = s3.Bucket(bucket_name)
 
     # TODO: Works for now because my website has very few files, but long-term this is sus
-    objects = {summary.object_key: S3Object(summary.object_key, summary.e_tag, False)
+    objects = {summary.key: S3Object(summary.key, summary.e_tag, False)
                for summary in bucket.objects.all()}
 
     # Tuples of (system path, S3 key)
