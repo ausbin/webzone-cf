@@ -56,9 +56,9 @@ Resources:
           GIT_CLONE_URL: !Ref GitCloneUrl
           WEBSITE_BUCKET_NAME: !Ref WebsiteBucketName
           DISTRIBUTION_ID: !Ref CfDistribution
+      Policies:
       # List of S3 Actions (it is easier to find the Fountain of Youth than this list):
       # https://docs.aws.amazon.com/AmazonS3/latest/userguide/list_amazons3.html#amazons3-actions-as-permissions
-      Policies:
       - Version: '2012-10-17'
         Statement:
         - Effect: Allow
@@ -73,6 +73,22 @@ Resources:
           Action:
           - 's3:ListBucket'
           Resource: !GetAtt WebsiteBucket.Arn
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal: '*'
+          Action: 'lambda:InvokeFunctionUrl'
+          Resource: !GetAtt RebuilderFunction.Arn
+          Condition:
+            StringEquals:
+              'lambda:FunctionUrlAuthType': NONE
+
+  RebuilderFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !GetAtt RebuilderFunction.Arn
+      Qualifier: rebuild-webzone
+      AuthType: NONE
 
   CfDistribution:
     Type: AWS::CloudFront::Distribution
