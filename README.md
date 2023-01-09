@@ -5,12 +5,21 @@ This is the CloudFormation template for my [personal website][0]. This
 repository uses [SAM][1], a handy wrapper around [CloudFormation][2]. The
 lambda regenerates the static website assets using [Hugo][3].
 
-How to update:
+For an initial setup, run:
 
     $ pip3 install --user --upgrade awscli aws-sam-cli
+    $ aws ecr create-repository --repository-name webzone --region us-east-1
+
+Make note of the `repositoryUri` printed above and update `$repository_uri` at
+the top of `update.sh`. If this is a fresh clone of this repo and the repo
+already exists, `aws ecr describe-repositories --region us-east-1` could help
+find the URI.
+
+To update:
+
     $ ./update.sh
 
-The first time you run this, you'll need to:
+Additionally, the first time you run this, you'll need to:
 
 1. Add a CNAME record for the hostname, which is needed for generating the SSL
    cert. If you go to the Events tab in the CloudFront section of the AWS
@@ -35,3 +44,4 @@ Links
 [1]: https://aws.amazon.com/serverless/sam/
 [2]: https://aws.amazon.com/cloudformation/
 [3]: https://gohugo.io/
+[4]: https://github.com/aws/aws-cli/issues/4947#issuecomment-586046886
