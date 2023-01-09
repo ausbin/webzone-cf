@@ -73,15 +73,6 @@ Resources:
           Action:
           - 's3:ListBucket'
           Resource: !GetAtt WebsiteBucket.Arn
-      #- Version: '2012-10-17'
-      #  Statement:
-      #  - Effect: Allow
-      #    Principal: '*'
-      #    Action: 'lambda:InvokeFunctionUrl'
-      #    Resource: !GetAtt RebuilderFunction.Arn
-      #    Condition:
-      #      StringEquals:
-      #        'lambda:FunctionUrlAuthType': NONE
 
   RebuilderFunctionUrlPermission:
     Type: AWS::Lambda::Permission
@@ -129,5 +120,10 @@ Resources:
     Properties:
       DomainName: !Ref WebsiteHostname
       ValidationMethod: DNS
+
+Outputs:
+  WebhookUrl:
+    Description: 'URL to enter as the GitHub webhook'
+    Value: !GetAtt RebuilderFunctionUrl.FunctionUrl
 
 # vim:set ts=2 sw=2 et:
