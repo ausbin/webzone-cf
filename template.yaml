@@ -73,15 +73,23 @@ Resources:
           Action:
           - 's3:ListBucket'
           Resource: !GetAtt WebsiteBucket.Arn
-      - Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal: '*'
-          Action: 'lambda:InvokeFunctionUrl'
-          Resource: !GetAtt RebuilderFunction.Arn
-          Condition:
-            StringEquals:
-              'lambda:FunctionUrlAuthType': NONE
+      #- Version: '2012-10-17'
+      #  Statement:
+      #  - Effect: Allow
+      #    Principal: '*'
+      #    Action: 'lambda:InvokeFunctionUrl'
+      #    Resource: !GetAtt RebuilderFunction.Arn
+      #    Condition:
+      #      StringEquals:
+      #        'lambda:FunctionUrlAuthType': NONE
+
+  RebuilderFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt RebuilderFunction.Arn
+      Principal: '*'
+      Action: 'lambda:InvokeFunctionUrl'
+      FunctionUrlAuthType: NONE
 
   RebuilderFunctionUrl:
     Type: AWS::Lambda::Url
