@@ -77,7 +77,7 @@ def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
 
         top = False
 
-    to_nuke = [obj.key for obj in objects if not obj.visited]
+    to_nuke = [obj.key for obj in objects.values() if not obj.visited]
 
     if to_nuke:
         # TODO: would using VersionIds here prevent concurrent runs of this Lambda
