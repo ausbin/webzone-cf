@@ -83,7 +83,6 @@ Resources:
         - !Ref WebsiteHostname
         Enabled: true
         IPV6Enabled: true
-        DefaultRootObject: index.html
         CustomErrorResponses:
         - ErrorCode: 403
           ResponseCode: 404
