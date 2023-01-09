@@ -9,7 +9,7 @@ For an initial setup, run:
 
     $ pip3 install --user --upgrade awscli aws-sam-cli
 
-If the stack does not exist yet, create it:
+If the stack does not exist yet, create the ECR (docker image) repository:
 
     $ aws ecr create-repository --repository-name webzone --region us-east-1
 
@@ -22,11 +22,13 @@ and put the `repositoryUri` printed above in `$repository_uri` at the top of
 
 Additionally, the first time you run this, you'll need to:
 
-1. Add a CNAME record for the hostname, which is needed for generating the SSL
-   cert. If you go to the Events tab in the CloudFront section of the AWS
-   Console for the stack, you can see what CNAME it expects
+1. In the past, I've needed to add a CNAME record for the hostname, which is
+   needed for generating the SSL cert. I went to the Events tab in the
+   CloudFormation section of the AWS Console for the stack to see what CNAME it
+   expects. However, I did not need that this time around, possibly because my
+   domain is in Route 53?
 2. Add A and AAAA records which are aliases for the CloudFront
-   distribution once CloudFormation has set it up
+   distribution once CloudFormation has set it up (still had to do this)
 
 To locally test the lambda, you can use `./local.py` inside `webzone/`. There
 are various flags that change its behavior. You can create a virtualenv (e.g.,
@@ -37,9 +39,9 @@ There's probably some overcomplicated SAM way to do this instead but I don't car
 Links
 -----
 
-* Main link (goes through CloudFront): <https://gtpd-monitor.austinjadams.com/>
+* Main link (goes through CloudFront): <https://ausb.in/>
 * Backup link (hits S3 directly, useful if you want to bypass CloudFront for
-  debugging): <http://gtpd-monitor-website.s3-website-us-east-1.amazonaws.com/>
+  debugging): <http://austinjadams-com-website.s3-website-us-east-1.amazonaws.com/>
 
 [0]: https://github.com/ausbin/webzone
 [1]: https://aws.amazon.com/serverless/sam/
