@@ -2,7 +2,7 @@ import os
 import boto3
 import hashlib
 from typing import Optional
-from dataclass import dataclass
+from dataclasses import dataclass
 from boto3.s3.transfer import TransferConfig
 
 # Very important to keep this constant! Can't trust the default
