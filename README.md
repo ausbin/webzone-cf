@@ -8,14 +8,15 @@ lambda regenerates the static website assets using [Hugo][3].
 For an initial setup, run:
 
     $ pip3 install --user --upgrade awscli aws-sam-cli
+
+If the stack does not exist yet, create it:
+
     $ aws ecr create-repository --repository-name webzone --region us-east-1
 
-Make note of the `repositoryUri` printed above and update `$repository_uri` at
-the top of `update.sh`. If this is a fresh clone of this repo and the repo
-already exists, `aws ecr describe-repositories --region us-east-1` could help
-find the URI.
+and put the `repositoryUri` printed above in `$repository_uri` at the top of
+`update.sh`.
 
-To update:
+**To update**:
 
     $ ./update.sh
 

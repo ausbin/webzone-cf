@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e -x
 
-# TODO: update me according to the README!
-repository_uri=55555.dkr.ecr.us-east-1.amazonaws.com/FIXME
+repository_uri=917270012582.dkr.ecr.us-east-1.amazonaws.com/webzone
 
+# From https://aws.amazon.com/blogs/compute/using-container-image-support-for-aws-lambda-with-aws-sam/
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$repository_uri"
 
 sam build
