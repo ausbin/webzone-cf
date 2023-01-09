@@ -38,12 +38,6 @@ Resources:
           Principal: '*'
           Action: 's3:GetObject'
           Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}/*'
-        - Sid: AllowPrivateAccess
-          Effect: Allow
-          Principal:
-            CanonicalUser: !GetAtt CfOriginAccessIdentity.S3CanonicalUserId
-          Action: 's3:GetObject'
-          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}/*'
 
   RebuilderFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -104,20 +98,12 @@ Resources:
           SslSupportMethod: sni-only
         Origins:
         - Id: s3
-          DomainName: !Sub '${WebsiteBucketName}.s3.amazonaws.com'
-          S3OriginConfig:
-            OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CfOriginAccessIdentity}'
+          DomainName: !Sub '${WebsiteBucketName}.s3-website.${AWS::Region}.amazonaws.com'
 
   CfDistributionCert:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: !Ref WebsiteHostname
       ValidationMethod: DNS
-
-  CfOriginAccessIdentity:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: 'webzone bucket identity'
 
 # vim:set ts=2 sw=2 et:
