@@ -25,7 +25,7 @@ def calc_etag(fp, chunk_size):
         chunk_hashes.append(hashlib.md5(chunk))
 
     if not chunk_hashes:
-        return f'"{hashlib.md5(b'').hexdigest()}"'
+        return f'"{hashlib.md5(b"").hexdigest()}"'
     elif len(chunk_hashes) == 1:
         return f'"{chunk_hashes[0].hexdigest()}"'
     else:
