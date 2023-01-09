@@ -10,6 +10,9 @@ def lambda_handler(event, context):
     bucket_name = os.environ['WEBSITE_BUCKET_NAME']
     distrib_id = os.environ['DISTRIBUTION_ID']
 
+    print('them', event['headers']['x-hub-signature-256'].lower())
+    print('us', hashlib.sha256(webhook_secret.encode('utf-8')).hexdigest())
+
     if event['headers']['x-hub-signature-256'].lower() != hashlib.sha256(webhook_secret.encode('utf-8')).hexdigest():
         raise ValueError('access denied!')
 
