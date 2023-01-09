@@ -6,6 +6,7 @@ Description: >
   Sample SAM Template for webzone
 
 Parameters:
+  WebhookSecret: {Type: String, NoEcho: true}
   GitCloneUrl: {Type: String}
   WebsiteBucketName: {Type: String}
   WebsiteHostname: {Type: String}
@@ -53,6 +54,7 @@ Resources:
       - arm64
       Environment:
         Variables:
+          WEBHOOK_SECRET: !Ref WebhookSecret
           GIT_CLONE_URL: !Ref GitCloneUrl
           WEBSITE_BUCKET_NAME: !Ref WebsiteBucketName
           DISTRIBUTION_ID: !Ref CfDistribution

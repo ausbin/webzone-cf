@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e -x
 
+if [[ -z $WEBHOOK_SECRET ]]; then
+    printf 'error: you need to define the environment variable $WEBHOOK_SECRET\n' >&2
+    exit 2
+fi
+
 repository_uri=917270012582.dkr.ecr.us-east-1.amazonaws.com/webzone
 
 # From https://aws.amazon.com/blogs/compute/using-container-image-support-for-aws-lambda-with-aws-sam/
@@ -15,3 +20,4 @@ sam deploy --template-file packaged.yaml --region us-east-1 \
            --parameter-overrides 'WebsiteBucketName=austinjadams-com-website' \
                                  'WebsiteHostname=ausb.in' \
                                  'GitCloneUrl=https://github.com/ausbin/webzone.git' \
+                                 "WebhookSecret=$WEBHOOK_SECRET"
