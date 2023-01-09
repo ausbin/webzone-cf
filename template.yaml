@@ -86,7 +86,7 @@ Resources:
   RebuilderFunctionUrlPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt RebuilderFunction.Arn
+      FunctionName: !Ref RebuilderFunction
       Principal: '*'
       Action: 'lambda:InvokeFunctionUrl'
       FunctionUrlAuthType: NONE
