@@ -78,9 +78,11 @@ def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
         top = False
 
     to_nuke = [obj.key for obj in objects if not obj.visited]
-    # TODO: would using VersionIds here prevent concurrent runs of this Lambda
-    #       from massively trolling?
-    bucket.delete_objects(Delete={'Objects': [{'Key': key} for key in to_nuke]})
+
+    if to_nuke:
+        # TODO: would using VersionIds here prevent concurrent runs of this Lambda
+        #       from massively trolling?
+        bucket.delete_objects(Delete={'Objects': [{'Key': key} for key in to_nuke]})
 
     for full_path, key in to_put:
         bucket.upload_file(full_path, key, Config=transfer_cfg)
