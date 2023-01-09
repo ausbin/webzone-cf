@@ -29,7 +29,7 @@ def calc_etag(fp, chunk_size):
     elif len(chunk_hashes) == 1:
         return f'"{chunk_hashes[0].hexdigest()}"'
     else:
-        return f'"{hashlib.md5(b''.join(chunk_hash.digest() for chunk_hash in chunk_hashes)).hexdigest()}-{len(chunk_hashes)}"'
+        return f'"{hashlib.md5(b"".join(chunk_hash.digest() for chunk_hash in chunk_hashes)).hexdigest()}-{len(chunk_hashes)}"'
 
 def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
     transfer_cfg = TransferConfig(multipart_threshold=CHUNK_SIZE, multipart_chunksize=CHUNK_SIZE)
