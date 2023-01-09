@@ -18,6 +18,7 @@ sam deploy --template-file packaged.yaml --region us-east-1 \
            --stack-name webzone \
            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
            --parameter-overrides 'WebsiteBucketName=austinjadams-com-website' \
-                                 'WebsiteHostname=ausb.in' \
+                                 'WebsiteHostname=austinjadams.com' \
+                                 'WebsiteAltHostnames=www.austinjadams.com,ausb.in,aja.gay' \
                                  'GitCloneUrl=https://github.com/ausbin/webzone.git' \
                                  "WebhookSecret=$WEBHOOK_SECRET"

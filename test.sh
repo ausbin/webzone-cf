@@ -8,6 +8,7 @@ fi
 
 sam build
 sam local invoke --parameter-overrides 'WebsiteBucketName=austinjadams-com-website' \
-                                       'WebsiteHostname=ausb.in' \
+                                       'WebsiteHostname=austinjadams.com' \
+                                       'WebsiteAltHostnames=www.austinjadams.com,ausb.in,aja.gay' \
                                        'GitCloneUrl=https://github.com/ausbin/webzone.git' \
                                        "WebhookSecret=$WEBHOOK_SECRET"

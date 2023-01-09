@@ -18,7 +18,13 @@ and put the `repositoryUri` printed above in `$repository_uri` at the top of
 
     $ export WEBHOOK_SECRET=SomeSecretValue
 
-**To update**:
+To avoid having to do this every time, it's helpful to write `SomeSecretValue`
+to `~/.webhook-secret` and then add the following to your `.bashrc`:
+
+    read -r WEBHOOK_SECRET <~/.webhook-secret
+    export WEBHOOK_SECRET
+
+**To update**, once you've done all that:
 
     $ ./update.sh
 
@@ -35,8 +41,9 @@ Additionally, the first time you run this, you'll need to:
    `./update.sh` as the webhook URL. Choose "only `push`". Add the secret
    `$WEBHOOK_SECRET`.
 
-To locally test the lambda, you can use `./test.sh`... almost. It works well
-enough for checking syntax errors, at least.
+To locally test the lambda, you can use `./test.sh`... almost. Something is
+broken about connecting to CloudFront but I don't care enough to debug. It
+works well enough for checking syntax errors, at least.
 
 Links
 -----
