@@ -4,6 +4,8 @@ from build import clone_shallow, hugo_build
 from update import push_to_s3
 
 def lambda_handler(event, context):
+    print(event)
+
     clone_url = os.environ['GIT_CLONE_URL']
     bucket_name = os.environ['WEBSITE_BUCKET_NAME']
     distrib_id = os.environ['DISTRIBUTION_ID']
