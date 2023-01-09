@@ -96,13 +96,12 @@ def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
 
     invalidate_paths = ['/' + key for key in to_invalidate]
 
-    print(invalidate_paths)
-
-    cf = boto3.client('cloudfront')
-    cf.create_invalidation(DistributionId=distrib_id, InvalidationBatch={
-        'CallerReference': unique_id,
-        'Paths': {
-            'Quantity': len(invalidate_paths),
-            'Items': invalidate_paths
-        },
-    })
+    if invalidate_paths:
+        cf = boto3.client('cloudfront')
+        cf.create_invalidation(DistributionId=distrib_id, InvalidationBatch={
+            'CallerReference': unique_id,
+            'Paths': {
+                'Quantity': len(invalidate_paths),
+                'Items': invalidate_paths
+            },
+        })
