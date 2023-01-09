@@ -1,6 +1,7 @@
 import os
 import boto3
 import hashlib
+import mimetypes
 from typing import Optional
 from dataclasses import dataclass
 from boto3.s3.transfer import TransferConfig
@@ -30,6 +31,13 @@ def calc_etag(fp, chunk_size):
         return f'"{chunk_hashes[0].hexdigest()}"'
     else:
         return f'"{hashlib.md5(b"".join(chunk_hash.digest() for chunk_hash in chunk_hashes)).hexdigest()}-{len(chunk_hashes)}"'
+
+def guess_mimetype(path):
+    type_, encoding = mimetypes.guess_type(path, strict=False)
+    if encoding is None:
+        return {}
+    else:
+        {'ContentType': type_}
 
 def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
     transfer_cfg = TransferConfig(multipart_threshold=CHUNK_SIZE, multipart_chunksize=CHUNK_SIZE)
@@ -86,7 +94,7 @@ def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
         bucket.delete_objects(Delete={'Objects': [{'Key': key} for key in to_nuke]})
 
     for full_path, key in to_put:
-        bucket.upload_file(full_path, key, Config=transfer_cfg)
+        bucket.upload_file(full_path, key, ExtraArgs=guess_mimetype(full_path), Config=transfer_cfg)
 
     # Now, finally, invalidate everyone!
     to_invalidate = ['/' + key for key in to_nuke] + ['/' + key for _, key in to_put]
