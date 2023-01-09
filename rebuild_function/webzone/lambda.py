@@ -11,9 +11,6 @@ def lambda_handler(event, context):
     bucket_name = os.environ['WEBSITE_BUCKET_NAME']
     distrib_id = os.environ['DISTRIBUTION_ID']
 
-    print('them', event['headers']['x-hub-signature-256'].lower())
-    print('us', hashlib.sha256(webhook_secret.encode('utf-8')).hexdigest())
-
     # The format is apparently
     #   sha256=9cc57f2ca39c2d81aed7e3d82af0b5711863bd3403bb8f024c4c3b4ecf9652a4
     their_hmac = event['headers']['x-hub-signature-256'].split('=', 1)[-1].lower()
