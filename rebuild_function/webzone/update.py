@@ -54,13 +54,10 @@ def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
         dir_ = '/'.join(relpath.strip(os.sep).split(os.sep))
 
         for file in files:
-            if file == 'index.html' and not top:
-                key = dir_ + '/'
+            if dir_:
+                key = dir_ + '/' + file
             else:
-                if dir_:
-                    key = dir_ + '/' + file
-                else:
-                    key = file
+                key = file
 
             full_path = os.path.join(path, file)
             if key in objects:
@@ -92,13 +89,10 @@ def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
         bucket.upload_file(full_path, key, Config=transfer_cfg)
 
     # Now, finally, invalidate everyone!
-    to_invalidate = to_nuke + [key for _, key in to_put]
+    to_invalidate = ['/' + key for key in to_nuke] + ['/' + key for _, key in to_put]
 
-    # Hack to also invalidate / when we update /index.html
-    if 'index.html' in to_invalidate:
-        to_invalidate.append('')
-
-    invalidate_paths = ['/' + key for key in to_invalidate]
+    invalidate_paths = [key.removesuffix('index.html') if key.endswith('/index.html') else key
+                        for key in to_invalidate]
 
     if invalidate_paths:
         cf = boto3.client('cloudfront')
