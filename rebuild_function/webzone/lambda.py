@@ -1,5 +1,6 @@
 import os
-import hashlib
+import hmac
+import json
 from tempfile import TemporaryDirectory as TmpDir
 from build import clone_shallow, hugo_build
 from update import push_to_s3
@@ -13,10 +14,14 @@ def lambda_handler(event, context):
     print('them', event['headers']['x-hub-signature-256'].lower())
     print('us', hashlib.sha256(webhook_secret.encode('utf-8')).hexdigest())
 
-    if event['headers']['x-hub-signature-256'].lower() != hashlib.sha256(webhook_secret.encode('utf-8')).hexdigest():
+    # The format is apparently
+    #   sha256=9cc57f2ca39c2d81aed7e3d82af0b5711863bd3403bb8f024c4c3b4ecf9652a4
+    their_hmac = event['headers']['x-hub-signature-256'].split('=', 1)[-1].lower()
+    our_hmac = hmac.new(webhook_secret.encode('utf-8'), event['body'].encode('utf-8'), 'sha256').hexdigest()
+    if hmac.compare_digest(their_hmac, our_hmac)
         raise ValueError('access denied!')
 
-    if event['body']['ref'] != 'refs/heads/master':
+    if json.loads(event['body'])['ref'] != 'refs/heads/master':
         print('ignoring push since not to master')
         return 'irrelevant ref ignored'
 
