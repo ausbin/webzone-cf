@@ -10,10 +10,10 @@ def lambda_handler(event, context):
     bucket_name = os.environ['WEBSITE_BUCKET_NAME']
     distrib_id = os.environ['DISTRIBUTION_ID']
 
-    if context['headers']['x-hub-signature-256'].lower() != hashlib.sha256(webhook_secret).hexdigest():
+    if event['headers']['x-hub-signature-256'].lower() != hashlib.sha256(webhook_secret).hexdigest():
         raise ValueError('access denied!')
 
-    if context['body']['ref'] != 'refs/heads/master':
+    if event['body']['ref'] != 'refs/heads/master':
         print('ignoring push since not to master')
         return 'irrelevant ref ignored'
 
