@@ -9,6 +9,7 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 sam build
 sam package --output-template-file packaged.yaml --region us-east-1 --resolve-s3 --image-repository "$repository_uri"
 sam deploy --template-file packaged.yaml --region us-east-1 \
+           --image-repository "$repository_uri" \
            --stack-name webzone \
            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
            --parameter-overrides 'WebsiteBucketName=austinjadams-com-website' \

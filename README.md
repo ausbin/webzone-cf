@@ -1,4 +1,4 @@
-Webzone Cloud Formation
+webzone Cloud Formation
 =======================
 
 This is the CloudFormation template for my [personal website][0]. This
