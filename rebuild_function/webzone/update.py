@@ -34,10 +34,10 @@ def calc_etag(fp, chunk_size):
 
 def guess_mimetype(path):
     type_, encoding = mimetypes.guess_type(path, strict=False)
-    if encoding is None:
+    if type_ is None:
         return {}
     else:
-        {'ContentType': type_}
+        return {'ContentType': type_}
 
 def push_to_s3(local_path, distrib_id, bucket_name, unique_id):
     transfer_cfg = TransferConfig(multipart_threshold=CHUNK_SIZE, multipart_chunksize=CHUNK_SIZE)
