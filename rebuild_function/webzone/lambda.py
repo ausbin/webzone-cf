@@ -1,7 +1,7 @@
 import os
 from tempfile import TemporaryDirectory as TmpDir
-from .build import clone_shallow, hugo_build
-from .update import push_to_s3
+from build import clone_shallow, hugo_build
+from update import push_to_s3
 
 def lambda_handler(event, context):
     clone_url = os.environ['GIT_CLONE_URL']
