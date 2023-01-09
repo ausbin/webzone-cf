@@ -97,7 +97,7 @@ Resources:
     DependsOn: WebsiteBucket
     Properties:
       DistributionConfig:
-        Aliases: !Split [!Join [',', [!Ref WebsiteHostname, !Ref WebsiteAltHostnames]], ',']
+        Aliases: !Split [',', !Join [',', [!Ref WebsiteHostname, !Ref WebsiteAltHostnames]]]
         Enabled: true
         IPV6Enabled: true
         CustomErrorResponses:
@@ -122,7 +122,7 @@ Resources:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: !Ref WebsiteHostname
-      SubjectAlternativeNames: !Split [!Ref WebsiteAltHostnames, ',']
+      SubjectAlternativeNames: !Split [',', !Ref WebsiteAltHostnames]
       ValidationMethod: DNS
 
 Outputs:
