@@ -54,7 +54,6 @@ Resources:
       DockerTag: python3.9-v1
     Properties:
       PackageType: Image
-      Handler: webzone/lambda.lambda_handler
       Architectures:
       #- x86_64
       - arm64
