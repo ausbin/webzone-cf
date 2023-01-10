@@ -157,6 +157,9 @@ Resources:
         Aliases: !Split [',', !Ref WebsiteAltHostnames]
         Enabled: true
         IPV6Enabled: true
+        DefaultCacheBehavior:
+          TargetOriginId: s3
+          ViewerProtocolPolicy: allow-all
         ViewerCertificate:
           AcmCertificateArn: !Ref CfDistributionCert
         Origins:
