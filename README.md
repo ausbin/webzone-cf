@@ -30,11 +30,9 @@ to `~/.webhook-secret` and then add the following to your `.bashrc`:
 
 Additionally, the first time you run this, you'll need to:
 
-1. In the past, I've needed to add a CNAME record for the hostname, which is
-   needed for generating the SSL cert. I went to the Events tab in the
-   CloudFormation section of the AWS Console for the stack to see what CNAME it
-   expects. However, I did not need that this time around, possibly because my
-   domain is in Route 53?
+1. Add a CNAME record for the hostname, which is needed for generating the SSL
+   cert. I've found it's best to go to [the AWS Certificate Manager][5] and see
+   what all CNAMEs it wants, since CloudFormation may only tell you one of them.
 2. Add A and AAAA records which are aliases for the CloudFront
    distribution once CloudFormation has set it up (still had to do this)
 3. Go into the GitHub settings for the repository and add the URL output by
@@ -57,3 +55,4 @@ Links
 [2]: https://aws.amazon.com/cloudformation/
 [3]: https://gohugo.io/
 [4]: https://github.com/aws/aws-cli/issues/4947#issuecomment-586046886
+[5]: https://us-east-1.console.aws.amazon.com/acm/home?region=us-east-1

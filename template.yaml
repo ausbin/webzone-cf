@@ -152,8 +152,6 @@ Resources:
 
   CfRedirectDistribution:
     Type: AWS::CloudFront::Distribution
-    # Temporary to get these CNAMEs removed from that
-    DependsOn: CfDistribution
     Properties:
       DistributionConfig:
         Aliases: !Split [',', !Ref WebsiteAltHostnames]
