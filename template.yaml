@@ -162,6 +162,7 @@ Resources:
           ViewerProtocolPolicy: allow-all
         ViewerCertificate:
           AcmCertificateArn: !Ref CfDistributionCert
+          SslSupportMethod: sni-only
         Origins:
         - Id: s3redirect
           DomainName: !Sub '${WebsiteBucketName}-redirect.s3-website.${AWS::Region}.amazonaws.com'
