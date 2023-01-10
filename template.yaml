@@ -31,7 +31,7 @@ Resources:
     Type: AWS::S3::BucketPolicy
     DependsOn: WebsiteBucket
     Properties:
-      Bucket: !Ref WebsiteBucketName
+      Bucket: !Ref WebsiteBucket
       PolicyDocument:
         Version: 2012-10-17
         Id: AllowCloudfrontAccess
@@ -41,6 +41,30 @@ Resources:
           Principal: '*'
           Action: 's3:GetObject'
           Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}/*'
+
+  RedirectBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${WebsiteBucketName}Redirect'
+      WebsiteConfiguration:
+        RedirectAllRequestsTo:
+          HostName: !Ref WebsiteHostname
+          Protocol: https
+
+  RedirectBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: WebsiteBucket
+    Properties:
+      Bucket: !Ref RedirectBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Id: AllowCloudfrontAccess
+        Statement:
+        - Sid: AllowPublicReadAccess
+          Effect: Allow
+          Principal: '*'
+          Action: 's3:GetObject'
+          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}Redirect/*'
 
   RebuilderFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -97,7 +121,8 @@ Resources:
     DependsOn: WebsiteBucket
     Properties:
       DistributionConfig:
-        Aliases: !Split [',', !Join [',', [!Ref WebsiteHostname, !Ref WebsiteAltHostnames]]]
+        Aliases:
+        - !Ref WebsiteHostname
         Enabled: true
         IPV6Enabled: true
         CustomErrorResponses:
@@ -124,6 +149,21 @@ Resources:
       DomainName: !Ref WebsiteHostname
       SubjectAlternativeNames: !Split [',', !Ref WebsiteAltHostnames]
       ValidationMethod: DNS
+
+  CfRedirectDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases: !Split [',', !Ref WebsiteAltHostnames]
+        Enabled: true
+        IPV6Enabled: true
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CfDistributionCert
+        Origins:
+        - Id: s3redirect
+          DomainName: !Sub '${WebsiteBucketName}Redirect.s3-website.${AWS::Region}.amazonaws.com'
+          CustomOriginConfig:
+            OriginProtocolPolicy: http-only
 
 Outputs:
   WebhookUrl:
