@@ -158,7 +158,7 @@ Resources:
         Enabled: true
         IPV6Enabled: true
         DefaultCacheBehavior:
-          TargetOriginId: s3
+          TargetOriginId: s3redirect
           ViewerProtocolPolicy: allow-all
         ViewerCertificate:
           AcmCertificateArn: !Ref CfDistributionCert
