@@ -45,7 +45,7 @@ Resources:
   RedirectBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub '${WebsiteBucketName}Redirect'
+      BucketName: !Sub '${WebsiteBucketName}-redirect'
       WebsiteConfiguration:
         RedirectAllRequestsTo:
           HostName: !Ref WebsiteHostname
@@ -64,7 +64,7 @@ Resources:
           Effect: Allow
           Principal: '*'
           Action: 's3:GetObject'
-          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}Redirect/*'
+          Resource: !Sub 'arn:aws:s3:::${WebsiteBucketName}-redirect/*'
 
   RebuilderFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -164,7 +164,7 @@ Resources:
           AcmCertificateArn: !Ref CfDistributionCert
         Origins:
         - Id: s3redirect
-          DomainName: !Sub '${WebsiteBucketName}Redirect.s3-website.${AWS::Region}.amazonaws.com'
+          DomainName: !Sub '${WebsiteBucketName}-redirect.s3-website.${AWS::Region}.amazonaws.com'
           CustomOriginConfig:
             OriginProtocolPolicy: http-only
 
