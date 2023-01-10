@@ -158,6 +158,8 @@ Resources:
         Enabled: true
         IPV6Enabled: true
         DefaultCacheBehavior:
+          # TODO: is this the right choice?
+          ForwardedValues: {QueryString: false}
           TargetOriginId: s3redirect
           ViewerProtocolPolicy: allow-all
         ViewerCertificate:
