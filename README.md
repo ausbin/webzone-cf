@@ -43,6 +43,13 @@ To locally test the lambda, you can use `./test.sh`... almost. Something is
 broken about connecting to CloudFront but I don't care enough to debug. It
 works well enough for checking syntax errors, at least.
 
+Random Tricks
+-------------
+
+To create a redirect:
+
+    $ aws s3api put-object --website-redirect-location 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' --bucket austinjadams-com-website --key /redirect-from-here
+
 Links
 -----
 
